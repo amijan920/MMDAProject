@@ -2,8 +2,16 @@ body {
 	font-family: 'Roboto', sans-serif;
 }
 
-#line-filter {
+#bubble-chart {
+	background: #E5E5E5;
+	height:450px;
+	width:100%;
+}
 
+#time-bar {
+	width:30px;
+	height:450px;
+	background: #E5E5E5;
 }
 
 .c-panel-label {
@@ -12,7 +20,7 @@ body {
 }
 
 .c-panel-sub-label {
-	font-size:1em;
+	font-size:0.8em;
 	color:#888888;
 
 }
