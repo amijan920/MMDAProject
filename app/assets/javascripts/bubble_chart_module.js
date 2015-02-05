@@ -3,7 +3,7 @@ BubbleChart = (function() {
 		this.charge = __bind(this.charge, this);
 		this.display_group_all = __bind(this.display_group_all, this);
 		this.start = __bind(this.start, this);
-		this.move_towards_center __bind(this.move_towards_center, this);
+		this.move_towards_center = __bind(this.move_towards_center, this);
 
 
 		this.context = $("#bubble-chart");

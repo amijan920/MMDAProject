@@ -24,12 +24,27 @@ body {
 	color:#888888;
 
 }
+
 .c-panel-body {
 	margin-top:16px;
 }
 
+.vis-btn {
+	background:#E5E5E5;
+	padding:11px;
+	float:right;
+}
+
+.vis-btn:hover {
+	background:#D5D5D5;
+	padding:11px;
+	float:right;
+	cursor:pointer;
+}
+
 .line-square {
 	float:left;
+	position:relative;
 	width:15px;
 	height:15px;
 	margin-right:8px;
@@ -38,11 +53,23 @@ body {
 
 	border-width: 2px;
 	border-color:#222222;
-	border-style: solid
+	border-style: solid;
+	border-radius:2px;
 }
 
 .line-square.unselected {
 	background:none;
+}
+
+.line-square:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0);
+    z-index: 1;
 }
 
 .line-item {
@@ -50,8 +77,13 @@ body {
 }
 
 .line-item:hover .line-label {
-	color:#555555;
+	color:#888888;
 	cursor:pointer;
+}
+
+.line-item:hover .line-square:after {
+	cursor:pointer;
+  background-color: rgba(255, 255, 255, .2);
 }
 
 #content {
