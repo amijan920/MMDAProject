@@ -1,0 +1,51 @@
+body {
+	font-family: 'Roboto', sans-serif;
+}
+
+#line-filter {
+
+}
+
+.c-panel-label {
+	font-size:1.4em;
+	font-weight: 700;
+}
+
+.c-panel-sub-label {
+	font-size:1em;
+	color:#888888;
+
+}
+.c-panel-body {
+	margin-top:16px;
+}
+
+.line-square {
+	float:left;
+	width:15px;
+	height:15px;
+	margin-right:8px;
+	margin-top:2px;
+	background:#222222;
+
+	border-width: 2px;
+	border-color:#222222;
+	border-style: solid
+}
+
+.line-square.unselected {
+	background:none;
+}
+
+.line-item {
+	margin:8px 0px;
+}
+
+.line-item:hover .line-label {
+	color:#555555;
+	cursor:pointer;
+}
+
+#content {
+	padding-top:64px;
+}
