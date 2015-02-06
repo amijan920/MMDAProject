@@ -12,13 +12,24 @@ BubbleChart = (function() {
 
 		this.context = $("#bubble-chart");
 		this.width = this.context.width();
+		this.bound_width = this.width - this.width/4;
 		this.height = this.context.height();
+		this.bound_height = this.height - this.height/4;
 		this.data = data;
 
 		this.fill_color = d3.scale.ordinal()
 			.domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 			.range(["#e25b83", "#ec7735", "#70c49b", "#f6c14f", 
 				"#8d5641", "#2e91cb", "#53c4c8", "#b193c0", "#c6c6c0"]);
+
+		this.line_centers = {};
+		for(var i = 0; i < data.length; i++) {
+			this.line_centers[data[i].lineID] = {};
+			this.line_centers[data[i].lineID].x = this.width/8 + (data[i].lineID % 5) * (this.bound_width/5) + this.bound_width/10;
+	 		this.line_centers[data[i].lineID].y = this.height/8 + Math.floor(data[i].lineID / 5) * (this.bound_height/2) + this.bound_height/4;
+		}
+		console.log(this.line_centers);
+
 
 		this.center = {
 			x: this.width/2,
@@ -33,6 +44,8 @@ BubbleChart = (function() {
 		this.create_nodes();
 		this.create_vis();
 	}
+	// ((d.lineID % 5) * (_this.width/5) + _this.width/10 + ((Math.random()*20) -10)
+	// ((d.lineID / 5) * (_this.height/2) + _this.height/4 + ((Math.random()*20) - 10))
 
 	BubbleChart.prototype.create_nodes = function() {
 		this.data.forEach((function(_this) {
@@ -43,8 +56,8 @@ BubbleChart = (function() {
 					line_id: d.lineID,
 					station_id: d.stationID,
 					station_name: d.stationName,
-					x: Math.random() * _this.width ((d.lineID % 5) * (_this.width/5)),
-					y: Math.random() * _this.height,
+					x: (((_this.width/2) + Math.cos(d.lineID*Math.PI*2/9)*200) + ((Math.random()*20) -10)),
+					y: (((_this.height/2) + Math.sin(d.lineID*Math.PI*2/9)*200) + ((Math.random()*20) -10)),
 					radius: ((Math.random() * 20) + 5),
 					value: 10
 				}
@@ -66,7 +79,6 @@ BubbleChart = (function() {
 
 		this.circles = this.vis.selectAll("circle")
 			.data(this.nodes, function(d) {
-				console.log(d.id);
 				return d.id;
 			});
 
@@ -79,7 +91,7 @@ BubbleChart = (function() {
 					return _this.fill_color(d.line_id);
 				};
 			})(this))
-			.attr("stroke-width", 2)
+			.attr("stroke-width", 1.5)
 			.attr("stroke", (function(_this) {
 				return function(d) {
 					return d3.rgb(_this.fill_color(d.line_id)).darker();
@@ -91,11 +103,20 @@ BubbleChart = (function() {
 				$("#testp").text(d.station_name);
 			}).on("mouseout", function(d, i) {
 				$("#testp").text("None");
+			})
+			.attr("cx", function(d) {
+				return d.x;
+			})
+			.attr("cy", function(d) {
+				return d.y;
+			})
+			.attr("class", function(d) {
+				return "circle-line-" + d.line_id;
 			});
 
 			return this.circles
 				.transition()
-				.duration(500)
+				.duration(1000)
 				.attr("r", function(d) {
 					return d.radius;
 				});
@@ -103,7 +124,7 @@ BubbleChart = (function() {
 	}
 
 	BubbleChart.prototype.charge = function(d) {
-		return -Math.pow(d.radius, 2.0)/7.8;
+		return -Math.pow(d.radius, 2.0)/8;
 	}
 
 	BubbleChart.prototype.start = function() {
@@ -134,6 +155,31 @@ BubbleChart = (function() {
 		})(this));
 	}
 
+	BubbleChart.prototype.display_by_line = function() {
+		this.force.gravity(this.layout_gravity)
+			.charge(this.charge)
+			.friction(0.9)
+			.on("tick", (function(_this) {
+				return function(e) {
+					return _this.circles.each(_this.move_towards_line(e.alpha))
+						.attr("cx", function(d) { return d.x; })
+						.attr("cy", function(d) { return d.y; });
+				}
+			})(this));
+			this.force.start();
+	}
+
+	BubbleChart.prototype.move_towards_line = function(alpha) {
+		return (function(_this) {
+			return function(d) {
+				var target;
+				target = _this.line_centers[d.line_id];
+				d.x = d.x + (target.x - d.x) * (_this.damper + 0.02) * alpha * 1.1;
+				d.y = d.y + (target.y - d.y) * (_this.damper + 0.02) * alpha * 1.1;
+			}
+		})(this);
+	};
+
 	return BubbleChart;
 })();
 
@@ -154,6 +200,36 @@ function createChart() {
 			return chart.display_group_all();
 		}
 	})(this);
+
+	root.display_line = (function(_this) {
+		return function() {
+			return chart.display_by_line();
+		};
+	})(this);
+
+	root.toggle_view = (function(_this) {
+		return function(view_type) {
+			if(view_type === 'line') {
+				root.display_line();
+			}
+			else {
+				root.display_all();
+			}
+		};
+	})(this);
+
+
+	$("#view-by-lines").click(function(e) {
+		root.display_line();
+		$("#view-by-lines").toggleClass("active", true);
+		$("#view-all").toggleClass("active", false);
+	});
+
+	$("#view-all").click(function(e) {
+		root.display_all();
+		$("#view-by-lines").toggleClass("active", false);
+		$("#view-all").toggleClass("active", true);
+	});
 
 	return d3.csv("assets/line_stations.csv", render_vis);
 }

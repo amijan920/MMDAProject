@@ -26,10 +26,16 @@ function toggle_lineFilter(d, i) {
 	if( $line_square.data("toggled") === 0) {
 		$line_square.data("toggled", 1);
 		$line_square.removeClass("unselected");
+		$(".circle-line-"+d.lineID).each ( function(e) {
+			$(this).fadeIn();
+		})
 	}
 	else {
 		$line_square.data("toggled", 0);
 		$line_square.addClass("unselected");
+		$(".circle-line-"+d.lineID).each ( function(e) {
+			$(this).fadeOut();
+		});
 	}
 }
 
