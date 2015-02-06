@@ -1,3 +1,7 @@
+/*	
+ *	Tutorial by: Jim Vallandingham
+ *	reference: http://vallandingham.me/bubble_charts_in_d3.html
+ */
 var BubbleChart, 
 	__bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -8,6 +12,7 @@ BubbleChart = (function() {
 		this.start = __bind(this.start, this);
 		this.move_towards_center = __bind(this.move_towards_center, this);
 		this.create_nodes = __bind(this.create_nodes, this);
+		this.create_edges = __bind(this.create_edges, this);
 		this.create_vis = __bind(this.create_vis, this);
 
 		this.context = $("#bubble-chart");
@@ -39,9 +44,12 @@ BubbleChart = (function() {
 		this.damper = 0.1;
 		this.force = null;
 		this.circles = null;
+		this.lines = null;
 		this.nodes = [];
+		this.edges = [];
 
 		this.create_nodes();
+		this.create_edges();
 		this.create_vis();
 	}
 	// ((d.lineID % 5) * (_this.width/5) + _this.width/10 + ((Math.random()*20) -10)
@@ -64,9 +72,32 @@ BubbleChart = (function() {
 				return _this.nodes.push(node);
 			};
 		})(this));
-		return this.nodes.sort(function(a, b) {
-			return b.value - a.value;
-		})
+
+		// return this.nodes.sort(function(a, b) {
+		// 	return b.value - a.value;
+		// })
+	}
+
+	BubbleChart.prototype.create_edges = function() {
+		for(var i = 0; i < this.nodes.length-1; i++) {
+			if( this.nodes[i].line_id != this.nodes[i+1].line_id )
+				continue;
+			var edge;
+			edge = {
+				p1: i,
+				p2: (i+1),
+				id: (i + "-" + (i+1)),
+				line_id: this.nodes[i].line_id
+			}
+			this.edges.push(edge);
+		}
+
+		// this.data.forEach((function(_this) {
+		// 	return function(d) {
+
+		// 		return _this.edges.push(edge);
+		// 	}
+		// })(this));
 	}
 
 	BubbleChart.prototype.create_vis = function() {
@@ -76,6 +107,44 @@ BubbleChart = (function() {
 			.attr("width", this.width)
 			.attr("height", this.height)
 			.attr("id", "svg_vis");
+
+		this.lines = this.vis.selectAll("line")
+			.data(this.edges, function(d) {
+				return d.id;
+			})
+
+		this.lines
+			.enter()
+			.append("line")
+			.attr("stroke-width", 3)
+			.attr("stroke", (function(_this) {
+				return function(d) {
+					return d3.rgb(_this.fill_color(d.line_id)).darker();
+				}
+			})(this))
+			.attr("x1", (function(_this) {
+				return function(d) {
+					return _this.nodes[d.p1].x
+				}
+			})(this))
+			.attr("x2", (function(_this) {
+				return function(d) {
+					return _this.nodes[d.p2].x
+				}
+			})(this))
+			.attr("y1", (function(_this) {
+				return function(d) {
+					return _this.nodes[d.p1].y
+				}
+			})(this))
+			.attr("y2", (function(_this) {
+				return function(d) {
+					return _this.nodes[d.p2].y
+				}
+			})(this))
+			.attr("class", function(d) {
+				return "edge-line-" + d.line_id;
+			});
 
 		this.circles = this.vis.selectAll("circle")
 			.data(this.nodes, function(d) {
@@ -114,12 +183,12 @@ BubbleChart = (function() {
 				return "circle-line-" + d.line_id;
 			});
 
-			return this.circles
-				.transition()
-				.duration(1000)
-				.attr("r", function(d) {
-					return d.radius;
-				});
+		return this.circles
+			.transition()
+			.duration(500)
+			.attr("r", function(d) {
+				return d.radius;
+			});
 
 	}
 
@@ -137,9 +206,30 @@ BubbleChart = (function() {
 		.friction(0.9)
 		.on("tick", (function(_this) {
 			return function(e) {
-				return _this.circles.each(_this.move_towards_center(e.alpha))
+				_this.circles.each(_this.move_towards_center(e.alpha))
 					.attr("cx", function(d) { return d.x })
 					.attr("cy", function(d) { return d.y });
+				_this.lines.each(function(d){})
+					.attr("x1", (function(__this) {
+						return function(d) {
+							return __this.nodes[d.p1].x
+						}
+					})(_this))
+					.attr("x2", (function(__this) {
+						return function(d) {
+							return __this.nodes[d.p2].x
+						}
+					})(_this))
+					.attr("y1", (function(__this) {
+						return function(d) {
+							return __this.nodes[d.p1].y
+						}
+					})(_this))
+					.attr("y2", (function(__this) {
+						return function(d) {
+							return __this.nodes[d.p2].y
+						}
+					})(_this));
 			}
 		})(this));
 		this.force.start();
@@ -161,9 +251,30 @@ BubbleChart = (function() {
 			.friction(0.9)
 			.on("tick", (function(_this) {
 				return function(e) {
-					return _this.circles.each(_this.move_towards_line(e.alpha))
+					_this.circles.each(_this.move_towards_line(e.alpha))
 						.attr("cx", function(d) { return d.x; })
 						.attr("cy", function(d) { return d.y; });
+					_this.lines.each(function(d){})
+						.attr("x1", (function(__this) {
+							return function(d) {
+								return __this.nodes[d.p1].x
+							}
+						})(_this))
+						.attr("x2", (function(__this) {
+							return function(d) {
+								return __this.nodes[d.p2].x
+							}
+						})(_this))
+						.attr("y1", (function(__this) {
+							return function(d) {
+								return __this.nodes[d.p1].y
+							}
+						})(_this))
+						.attr("y2", (function(__this) {
+							return function(d) {
+								return __this.nodes[d.p2].y
+							}
+						})(_this));
 				}
 			})(this));
 			this.force.start();
