@@ -92,6 +92,8 @@ function ready() {
 			.append("li")
 			.text(function(d){return d.lineName;});
 	}
+
+	createChart();
 }
 
 $(document).ready(ready);

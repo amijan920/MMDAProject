@@ -3,11 +3,6 @@
 	border-color:#e25b83;
 }
 
-.line-0 {
-	background:#dd6f93;
-	border-color:#dd6f93;
-}
-
 .line-1 {
 	background:#ec7735;
 	border-color:#ec7735;
@@ -41,9 +36,11 @@
 	border-color:#c6c6c0;
 }
 
-
-
-
+/*
+"#e25b83", "#ec7735", "#70c49b", "#f6c14f", 
+"#8d5641", "#2e91cb", "#53c4c8", "#b193c0", 
+"#c6c6c0"
+*/
 
 
 

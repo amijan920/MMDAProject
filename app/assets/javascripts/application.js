@@ -12,6 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require angular.min
 //= require jquery.cookie
 //= require d3.min
 //= require bootstrap

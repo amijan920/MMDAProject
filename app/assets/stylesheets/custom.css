@@ -31,14 +31,12 @@ body {
 
 .vis-btn {
 	background:#E5E5E5;
-	padding:11px;
+	padding:11px 16px;
 	float:right;
 }
 
 .vis-btn:hover {
 	background:#D5D5D5;
-	padding:11px;
-	float:right;
 	cursor:pointer;
 }
 
