@@ -56,8 +56,8 @@ BubbleChart = (function() {
 					line_id: d.lineID,
 					station_id: d.stationID,
 					station_name: d.stationName,
-					x: (((_this.width/2) + Math.cos(d.lineID*Math.PI*2/9)*200) + ((Math.random()*20) -10)),
-					y: (((_this.height/2) + Math.sin(d.lineID*Math.PI*2/9)*200) + ((Math.random()*20) -10)),
+					x: (((_this.width/2) + Math.cos(d.lineID*Math.PI*2/9 + Math.PI)*200) + ((Math.random()*20) -10)),
+					y: (((_this.height/2) + Math.sin(d.lineID*Math.PI*2/9 + Math.PI)*200) + ((Math.random()*20) -10)),
 					radius: ((Math.random() * 20) + 5),
 					value: 10
 				}
