@@ -131,3 +131,52 @@ body {
 #content {
 	padding-top:64px;
 }
+
+.circle-line:hover {
+	cursor:pointer;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(255, 255, 255, 1);
+  color: #222222;
+  border-radius: 2px;
+  border: 1px #D5D5D5 solid;
+  -webkit-transition: opacity 0.25s linear;
+	-moz-transition: opacity 0.25s linear;
+	-ms-transition: opacity 0.25s linear;
+	-o-transition: opacity 0.25s linear;
+	transition: opacity 0.25s linear;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:before, .d3-tip:after {
+  content: "";
+	position: absolute;
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	top: 100%;
+	left: 50%;
+	margin-left: -10px;
+}
+
+.d3-tip:after {
+	border-top: 10px solid rgba(255, 255, 255, 1);
+	margin-top: -2px;
+	z-index: 1;
+}
+
+.d3-tip:before {
+	border-top: 1px solid #D5D5D5;
+	border-top: 9px solid #D5D5D5;
+	margin-top: 0px;
+}
+
+/* Style northward tooltips differently */
+/*.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}*/

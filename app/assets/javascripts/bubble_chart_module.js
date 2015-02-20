@@ -2,6 +2,7 @@
  *	Tutorial by: Jim Vallandingham
  *	reference: http://vallandingham.me/bubble_charts_in_d3.html
  */
+
 var BubbleChart, 
 	__bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -69,7 +70,16 @@ BubbleChart = (function() {
 		this.create_nodes();
 		this.create_edges();
 		this.create_vis();
+
+		this.vis.call(this.tip);
 	}
+
+	BubbleChart.prototype.tip = d3.tip()
+	  .offset([-10, 0])
+	  .html(function(d) {
+	    return "<span>" + d.station_name + "</span>";
+  	})
+  	.attr("class", "d3-tip");
 
 	BubbleChart.prototype.create_nodes = function() {
 		this.data.forEach((function(_this) {
@@ -91,10 +101,6 @@ BubbleChart = (function() {
 				return _this.nodes.push(node);
 			};
 		})(this));
-
-		// return this.nodes.sort(function(a, b) {
-		// 	return b.value - a.value;
-		// })
 	}
 
 	BubbleChart.prototype.create_edges = function() {
@@ -180,13 +186,29 @@ BubbleChart = (function() {
 			})(this))
 			.attr("id", function(d) {
 				return "bubble-" + d.station_id;
-			}).on("mouseover", function(d, i) {
-				$("#testp").text(d.station_name);
-				$(this).attr("stroke-width", 4);
-			}).on("mouseout", function(d, i) {
-				$("#testp").text("");
-				$(this).attr("stroke-width", 1.5);
-			}).on("click", function(d) {
+			})
+			.on('mouseover', (function(_this){
+				return function(d) {
+					_this.tip.attr("class", "d3-tip line-text-" + d.line_id);
+					_this.tip.show(d);
+					$(this).attr("stroke-width", 4);
+				}
+			})(this))
+      .on('mouseout', (function(_this){
+				return function(d) {
+					_this.tip.hide(d);
+					$(this).attr("stroke-width", 1.5);
+				}
+			})(this))
+			// .on("mouseover", function(d, i) {
+			// 	$("#testp").text(d.station_name);
+			// 	$(this).attr("stroke-width", 4);
+			// })
+			// .on("mouseout", function(d, i) {
+			// 	$("#testp").text("");
+			// 	$(this).attr("stroke-width", 1.5);
+			// })
+			.on("click", function(d) {
 				var c = {};
 				c.lineID = d.line_id;
 				zoom_line(c);
@@ -413,13 +435,6 @@ function createChart() {
 			}
 		};
 	})(this);
-
-
-	// $("#view-scheme").click(function(e) {
-	// 	root.toggle_view('ind-line', c_line);
-	// 	$(".vis-btn").toggleClass("active", false);
-	// 	$("#view-scheme").toggleClass("active", true);
-	// });
 
 	$("#view-by-lines").click(function(e) {
 		root.toggle_view('line');

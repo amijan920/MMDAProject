@@ -15,6 +15,7 @@
 //= require angular.min
 //= require jquery.cookie
 //= require d3.min
+//= require d3-tip
 //= require bootstrap
 //= require owl.carousel.min
 //= require turbolinks
