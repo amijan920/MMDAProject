@@ -9,6 +9,12 @@ body {
 	border: 1px solid #E5E5E5;
 }
 
+#time-slider {
+	height:450px;
+	width:100%;
+	border: 1px solid #E5E5E5;
+}
+
 #time-bar {
 	width:30px;
 	height:450px;

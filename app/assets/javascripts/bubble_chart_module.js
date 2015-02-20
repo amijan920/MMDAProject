@@ -85,6 +85,11 @@ BubbleChart = (function() {
 		this.data.forEach((function(_this) {
 			return function(d) {
 				var node;
+				var rad = ((Math.random() * 20) + 5);
+				var overall = [];
+				for(var i = 0; i < 96; i++) {
+					overall[i] = ((Math.random() * 20) + 5);
+				}
 				node = {
 					id: (d.lineID + "S" + d.stationID),
 					line_id: d.lineID,
@@ -92,7 +97,9 @@ BubbleChart = (function() {
 					station_name: d.stationName,
 					x: (((_this.width/2) + Math.cos(d.lineID*Math.PI*2/9 + Math.PI)*200) + ((Math.random()*20) -10)),
 					y: (((_this.height/2) + Math.sin(d.lineID*Math.PI*2/9 + Math.PI)*200) + ((Math.random()*20) -10)),
-					radius: ((Math.random() * 20) + 5),
+					overall: overall,
+					radius: rad,
+					active_radius: overall[0],
 					value: 10
 				}
 				if(!_this.station_count[d.lineID])
@@ -227,13 +234,27 @@ BubbleChart = (function() {
 			.transition()
 			.duration(500)
 			.attr("r", function(d) {
-				return d.radius;
+				return d.active_radius;
 			});
 
 	}
 
+	BubbleChart.prototype.switchData = function(filter, time) {
+		this.circles
+			.transition()
+			.duration(500)
+			.attr("r", 
+				function(d){ 
+					d.active_radius = d[filter][time];
+					// d.active_radius = ((Math.random() * 20) + 5);
+					return d[filter][time];
+				}
+			);
+		this.force.start();
+	}
+
 	BubbleChart.prototype.charge = function(d) {
-		return -Math.pow(d.radius, 2.0)/8;
+		return -Math.pow(d.active_radius, 2.0)/8;
 	}
 
 	BubbleChart.prototype.start = function() {
@@ -433,6 +454,12 @@ function createChart() {
 			else {
 				root.display_all();
 			}
+		};
+	})(this);
+
+	root.switchData = (function(_this) {
+		return function(filter, time) {
+			return chart.switchData(filter, time);
 		};
 	})(this);
 

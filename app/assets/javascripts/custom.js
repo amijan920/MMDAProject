@@ -140,7 +140,8 @@ function toggle_all() {
 
 function ready() {
 	d3.csv("assets/line_names.csv", init_lineFilter);
-	createTimeSlider();
+	// createTimeSlider();
+	createTimeFilter();
 	createChart();
 
 	// $("#line-item-a").click(function(e){console.log("wut")});
