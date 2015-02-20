@@ -18,5 +18,6 @@
 //= require d3-tip
 //= require bootstrap
 //= require owl.carousel.min
+//= require d3.slider
 //= require turbolinks
 //= require_tree .
