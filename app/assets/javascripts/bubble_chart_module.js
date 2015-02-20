@@ -236,7 +236,6 @@ BubbleChart = (function() {
 			.attr("r", function(d) {
 				return d.active_radius;
 			});
-
 	}
 
 	BubbleChart.prototype.switchData = function(filter, time) {
@@ -251,6 +250,10 @@ BubbleChart = (function() {
 				}
 			);
 		this.force.start();
+	}
+
+	BubbleChart.prototype.addDataSet = function(filter, time) {
+
 	}
 
 	BubbleChart.prototype.charge = function(d) {
@@ -465,12 +468,16 @@ function createChart() {
 
 	$("#view-by-lines").click(function(e) {
 		root.toggle_view('line');
+
+		$("#visualization-title").html("Traffic along All Stations");
 		$(".vis-btn").toggleClass("active", false);
 		$("#view-by-lines").toggleClass("active", true);
 	});
 
 	$("#view-all").click(function(e) {
 		root.toggle_view('all');
+
+		$("#visualization-title").html("Traffic along All Stations");
 		$(".vis-btn").toggleClass("active", false);
 		$("#view-all").toggleClass("active", true);
 	});

@@ -12,7 +12,11 @@ body {
 #time-slider {
 	height:450px;
 	width:100%;
-	border: 1px solid #E5E5E5;
+	/*border: 1px solid #E5E5E5;*/
+}
+
+#day-filter select{
+	border-radius: 0px
 }
 
 #time-bar {

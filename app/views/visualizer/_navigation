@@ -1,0 +1,59 @@
+<nav class="navbar navbar-default navbar-fixed-top" style="margin:0px">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <% if @page == 'about' %>
+        	<a class="navbar-brand" href="#">Elite Street</a>
+      <% else %>
+      	<a class="navbar-brand" href="/">Elite Street</a>
+      <% end %>
+      
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right nav-menu">
+      	<% if @page == 'about' %>
+        	<li><a href="#" class="active">About Us</a></li>
+        <% else %>
+        	<li><a href="/">About Us</a></li>
+        <% end %>
+
+        <% if @page == 'strategies' %>
+        	<li><a href="#" class="active">Strategies</a></li>
+        <% else %>
+        	<li><a href="strategies">Strategies</a></li>
+        <% end %>
+
+        <% if @page == 'key' %>
+        	<li><a href="#" class="active">Key Indicators</a></li>
+        <% else %>
+        	<li><a href="keys">Key Indicators</a></li>
+        <% end %>
+
+        <% if @page == 'dashboard' %>
+        	<li><a href="#" class="active">Dashboard</a></li>
+        <% else %>
+        	<li><a href="dashboard">Dashboard</a></li>
+        <% end %>
+
+        <% if @page == 'financial' %>
+        	<li><a href="#" class="active">Financial Analysis</a></li>
+        <% else %>
+        	<li><a href="financial">Financial Analysis</a></li>
+        <% end %>
+
+        <% if @page == 'decision' %>
+        	<li><a href="#" class="active">Decision Support</a></li>
+        <% else %>
+        	<li><a href="decision">Decision Support</a></li>
+        <% end %>
+        
+    </div>
+  </div>
+</nav>

@@ -1,8 +1,13 @@
+var line_data;
+
 function init_lineFilter(data) {
 	var $line_filter = d3.select("#line-filter");
 	var $drop_down = d3.select("#view-scheme-menu");
 
 	var i = 1;
+
+	line_data = data;
+
 	var $line_divs = $line_filter.selectAll("div")
 		.data(data)
 		.enter()
@@ -63,6 +68,10 @@ function init_lineFilter(data) {
 function zoom_line(d) {
 	$(".vis-btn").toggleClass("active", false);
 	$("#view-scheme").toggleClass("active", true);
+
+	// console.log(line_data);
+	// console.log(line_data[d.lineID])
+	$("#visualization-title").html("Traffic along " + line_data[d.lineID].lineName);
 	
 	var $line_square = $("#line-item-"+d.lineID).find(".line-square");
 	$line_square.data("toggled", 1);
