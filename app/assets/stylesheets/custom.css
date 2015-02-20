@@ -19,6 +19,14 @@ body {
 	border-radius: 0px
 }
 
+#day-filter {
+	margin-bottom:8px;
+}
+
+#bound-filter select{
+	border-radius: 0px
+}
+
 #time-bar {
 	width:30px;
 	height:450px;
@@ -182,6 +190,14 @@ body {
 	border-top: 1px solid #D5D5D5;
 	border-top: 9px solid #D5D5D5;
 	margin-top: 0px;
+}
+
+.unselectable {
+   -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
 }
 
 /* Style northward tooltips differently */

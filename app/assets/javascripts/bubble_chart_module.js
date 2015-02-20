@@ -12,7 +12,7 @@ var c_view_type = 'all';
 var c_line = 2;
 
 BubbleChart = (function() {
-	function BubbleChart(data) {
+	function BubbleChart(data, overall_data) {
 		this.charge = __bind(this.charge, this);
 		this.display_group_all = __bind(this.display_group_all, this);
 		this.start = __bind(this.start, this);
@@ -27,10 +27,8 @@ BubbleChart = (function() {
 		this.height = this.context.height();
 		this.bound_height = this.height - this.height/4;
 		this.data = data;
-
-		// this.colors = ["#8dd3c7", "#ffffb3",
-		// 	"#bebada", "#fb8072", "#80b1d3",
-		// 	"#fdb462", "#b3de69", "#fccde5", "#d9d9d9"];
+		this.active_filter = "overall-a";
+		this.active_time = 0;
 
 		this.colors = ["#e25b83", "#ec7735", "#70c49b", "#f6c14f", 
 		 		"#8d5641", "#2e91cb", "#53c4c8", "#b193c0", "#c6c6c0"]
@@ -47,6 +45,7 @@ BubbleChart = (function() {
 		}
 
 		this.station_count = {};
+		this.station_start = {};
 
 		this.center = {
 			x: this.width/2,
@@ -68,6 +67,9 @@ BubbleChart = (function() {
 		this.edges = [];
 
 		this.create_nodes();
+
+		this.add_dataset("overall", overall_data, 0);
+
 		this.create_edges();
 		this.create_vis();
 
@@ -83,7 +85,7 @@ BubbleChart = (function() {
 
 	BubbleChart.prototype.create_nodes = function() {
 		this.data.forEach((function(_this) {
-			return function(d) {
+			return function(d, index) {
 				var node;
 				var rad = ((Math.random() * 20) + 5);
 				var overall = [];
@@ -102,8 +104,11 @@ BubbleChart = (function() {
 					active_radius: overall[0],
 					value: 10
 				}
-				if(!_this.station_count[d.lineID])
+				if(_this.station_count[d.lineID] == null)
 					_this.station_count[d.lineID] = 0;
+				if(_this.station_start[d.lineID] == null) {
+					_this.station_start[d.lineID] = index;
+				}
 				_this.station_count[d.lineID]++;
 				return _this.nodes.push(node);
 			};
@@ -207,14 +212,6 @@ BubbleChart = (function() {
 					$(this).attr("stroke-width", 1.5);
 				}
 			})(this))
-			// .on("mouseover", function(d, i) {
-			// 	$("#testp").text(d.station_name);
-			// 	$(this).attr("stroke-width", 4);
-			// })
-			// .on("mouseout", function(d, i) {
-			// 	$("#testp").text("");
-			// 	$(this).attr("stroke-width", 1.5);
-			// })
 			.on("click", function(d) {
 				var c = {};
 				c.lineID = d.line_id;
@@ -234,26 +231,59 @@ BubbleChart = (function() {
 			.transition()
 			.duration(500)
 			.attr("r", function(d) {
+				// console.log(d);
+				d.active_radius = d["overall-a"][0];
 				return d.active_radius;
 			});
 	}
 
-	BubbleChart.prototype.switchData = function(filter, time) {
+	BubbleChart.prototype.refreshData = function() {
 		this.circles
 			.transition()
 			.duration(500)
-			.attr("r", 
-				function(d){ 
-					d.active_radius = d[filter][time];
+			.attr("r", (function(_this) {
+				return function(d){ 
+					d.active_radius = d[_this.active_filter][_this.active_time];
 					// d.active_radius = ((Math.random() * 20) + 5);
-					return d[filter][time];
+					return d[_this.active_filter][_this.active_time];
 				}
-			);
+			})(this));
 		this.force.start();
 	}
 
-	BubbleChart.prototype.addDataSet = function(filter, time) {
+	BubbleChart.prototype.switch_dataset = function(filterName) {
+		this.active_filter = filterName;
+		this.refreshData();
+	}
 
+	BubbleChart.prototype.switch_time = function(time) {
+		this.active_time = time;
+		this.refreshData();
+	} 
+
+	BubbleChart.prototype.add_dataset = function(filterName, data) {
+		for(var i = 0; i < data.length; i++) {
+			var north = [];
+			var south = [];
+			var ave = [];
+			var line_id = data[i][0];
+			var station_id = data[i][1];
+			for(var j = 3; j < 3+96; j++) {
+				north[j-3] = (data[i][j]/2 * 20  ) + 5;
+				ave[j-3] = (data[i][j]/2 * 20  ) + 5;
+			}
+
+			for(var j = 100; j < 100+96; j++) {
+				south[j-100] = (data[i][j]/2 * 20  ) + 5;
+				ave[j-100] += (data[i][j]/2 * 20  ) + 5;
+				ave[j-100] /= 2;
+			}
+
+			var index = this.station_start[line_id] + station_id;
+			this.nodes[index][filterName + "-n"] = north;
+			this.nodes[index][filterName + "-s"] = south;
+			this.nodes[index][filterName + "-a"] = ave;
+		}
 	}
 
 	BubbleChart.prototype.charge = function(d) {
@@ -422,11 +452,12 @@ function createChart() {
 	var chart, render_vis;
 	chart = null;
 
-	render_vis = function(csv) {
-		chart = new BubbleChart(csv);
+	render_vis = function(csv1, csv2) {
+		chart = new BubbleChart(csv1, csv2);
 		chart.start();
 		return root.display_all();
 	}
+
 	root.display_all = (function(_this) {
 		return function() {
 			return chart.display_group_all();
@@ -460,10 +491,29 @@ function createChart() {
 		};
 	})(this);
 
-	root.switchData = (function(_this) {
-		return function(filter, time) {
-			return chart.switchData(filter, time);
+	root.switch_time = (function(_this) {
+		return function(time) {
+			return chart.switch_time(time);
 		};
+	})(this);
+
+	root.add_dataset = (function(_this) {
+		return function(filterName, data) {
+			return chart.add_dataset(filterName, data);
+		}
+	})(this);
+
+	root.switch_dataset = (function(_this) {
+		return function(filterName) {
+			return chart.switch_dataset(filterName);
+		}
+	})(this);
+
+	root.switch_overall_dataset = (function(_this) {
+		return function(filterName) {
+			chart.switch_dataset(filterName);
+			root.switch_slider_dataset(filterName);
+		}
 	})(this);
 
 	$("#view-by-lines").click(function(e) {
@@ -482,5 +532,39 @@ function createChart() {
 		$("#view-all").toggleClass("active", true);
 	});
 
-	return d3.csv("assets/line_stations.csv", render_vis);
+	d3.csv("assets/line_stations.csv", function(data1) {
+		return d3.text("assets/averaged_data/overall.txt", function(text) {
+			var data2 = d3.csv.parseRows(text).map(function(row) {
+		    return row.map(function(value) {
+		      return +value;
+		    });
+		  });
+			render_vis(data1, data2);
+			createTimeFilter(data2);
+
+			d3.csv("assets/filters.csv", function(filters) {
+				filters.forEach(function(d) {
+
+					var option = document.createElement("option");
+					option.text = d.label;
+					option.value = d.label;
+					option.disabled = true;
+
+					var menu = document.getElementById("filter-menu");
+					menu.add(option);
+					d3.text("assets/averaged_data/" + d.file_name + ".txt", function(text) {
+						var data = d3.csv.parseRows(text).map(function(row) {
+					    return row.map(function(value) {
+					      return +value;
+					    });
+					  });
+					  root.add_dataset(d.label, data);
+					  root.add_slider_dataset(d.label, data);
+					  $("option[value=\""+ d.label +"\"]").prop("disabled", false);
+					});
+				});
+			})
+		});
+	});
+
 }

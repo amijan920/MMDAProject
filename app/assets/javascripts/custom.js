@@ -146,12 +146,29 @@ function toggle_all() {
 	}
 }
 
+function switchFilter(filterName) {
+	root.switch_overall_dataset(filterName);
+}
+
 
 function ready() {
 	d3.csv("assets/line_names.csv", init_lineFilter);
 	// createTimeSlider();
-	createTimeFilter();
+	// createTimeFilter();
 	createChart();
+
+	var suffix = "-a";
+	var prefix = "overall";
+
+	$("#filter-menu").on('change', function() {
+		prefix = this.value;
+	  switchFilter(prefix + suffix); // or $(this).val()
+	});
+
+	$("#bound-menu").on('change', function() {
+		suffix = this.value
+	  switchFilter(prefix + suffix); // or $(this).val()
+	});
 
 	// $("#line-item-a").click(function(e){console.log("wut")});
 }
