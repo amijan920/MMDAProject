@@ -27,6 +27,10 @@ body {
 	border-radius: 0px
 }
 
+#bound-filter {
+	margin-bottom:24px;
+}
+
 #time-bar {
 	width:30px;
 	height:450px;

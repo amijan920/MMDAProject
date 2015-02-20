@@ -12,7 +12,7 @@ var c_view_type = 'all';
 var c_line = 2;
 
 BubbleChart = (function() {
-	function BubbleChart(data, overall_data) {
+	function BubbleChart(line_data, data, overall_data) {
 		this.charge = __bind(this.charge, this);
 		this.display_group_all = __bind(this.display_group_all, this);
 		this.start = __bind(this.start, this);
@@ -27,6 +27,7 @@ BubbleChart = (function() {
 		this.height = this.context.height();
 		this.bound_height = this.height - this.height/4;
 		this.data = data;
+		this.line_data = line_data;
 		this.active_filter = "overall-a";
 		this.active_time = 0;
 
@@ -227,6 +228,41 @@ BubbleChart = (function() {
 				return "circle-line circle-line-" + d.line_id;
 			});
 
+		this.center_text = this.vis
+			.append("g")
+				.append("text")
+					.style("text-anchor", "middle")
+					.style("font-size", "2em")
+					.attr("x", this.width/2)
+					.attr("y", this.height/2)
+					.attr("fill", "#222222")
+					.text("hello world")
+					.style("display", "none")
+					.style("opacity", 0);
+
+		// this.line_text = this.vis
+		// 	.append("g")
+		// 	.selectAll("text")
+		// 	.data(this.line_data);
+
+		// this.line_text
+		// 	.enter()
+		// 	.append("text")
+		// 	.attr("x", (function(_this){
+		// 		return function(d) {
+		// 			return _this.line_centers[d.lineID].x;
+		// 		}
+		// 	})(this))
+		// 	.attr("y", (function(_this){
+		// 		return function(d) {
+		// 			return _this.line_centers[d.lineID].y;
+		// 		}
+		// 	})(this))
+		// 	.text(function(d) {
+		// 		return d.lineName;
+		// 	})
+		// 	.style("text-anchor", "middle");
+
 		return this.circles
 			.transition()
 			.duration(500)
@@ -240,7 +276,7 @@ BubbleChart = (function() {
 	BubbleChart.prototype.refreshData = function() {
 		this.circles
 			.transition()
-			.duration(500)
+			.duration(250)
 			.attr("r", (function(_this) {
 				return function(d){ 
 					d.active_radius = d[_this.active_filter][_this.active_time];
@@ -269,13 +305,13 @@ BubbleChart = (function() {
 			var line_id = data[i][0];
 			var station_id = data[i][1];
 			for(var j = 3; j < 3+96; j++) {
-				north[j-3] = (data[i][j]/2 * 20  ) + 5;
-				ave[j-3] = (data[i][j]/2 * 20  ) + 5;
+				north[j-3] = (data[i][j]/2 * 25  ) + 5;
+				ave[j-3] = (data[i][j]/2 * 25  ) + 5;
 			}
 
 			for(var j = 100; j < 100+96; j++) {
-				south[j-100] = (data[i][j]/2 * 20  ) + 5;
-				ave[j-100] += (data[i][j]/2 * 20  ) + 5;
+				south[j-100] = (data[i][j]/2 * 25  ) + 5;
+				ave[j-100] += (data[i][j]/2 * 25  ) + 5;
 				ave[j-100] /= 2;
 			}
 
@@ -327,6 +363,12 @@ BubbleChart = (function() {
 			}
 		})(this));
 		this.force.start();
+
+		this.center_text
+				.transition()
+				.duration(250)
+				.style("display", "none")
+				.style("opacity", 0);
 		// return this.hide_years();
 	};
 
@@ -372,6 +414,12 @@ BubbleChart = (function() {
 				}
 			})(this));
 			this.force.start();
+
+			this.center_text
+				.transition()
+				.duration(250)
+				.style("display", "none")
+				.style("opacity", 0);
 	}
 
 	BubbleChart.prototype.move_towards_line = function(alpha) {
@@ -418,6 +466,21 @@ BubbleChart = (function() {
 				}
 			})(this));
 			this.force.start();
+
+			var text = "";
+			for(var i = 0; i < this.line_data.length; i++) {
+				if(this.line_data[i].lineID == line_id) {
+					text = this.line_data[i].lineName;
+				}
+			}
+
+			this.center_text
+				.text(text)
+				.style("display", "block")
+				.transition()
+				.duration(250)
+				.style("opacity", 1);
+
 	}
 
 	BubbleChart.prototype.move_towards_rect = function(alpha, line_id) {
@@ -452,8 +515,8 @@ function createChart() {
 	var chart, render_vis;
 	chart = null;
 
-	render_vis = function(csv1, csv2) {
-		chart = new BubbleChart(csv1, csv2);
+	render_vis = function(csv0, csv1, csv2) {
+		chart = new BubbleChart(csv0, csv1, csv2);
 		chart.start();
 		return root.display_all();
 	}
@@ -532,39 +595,40 @@ function createChart() {
 		$("#view-all").toggleClass("active", true);
 	});
 
-	d3.csv("assets/line_stations.csv", function(data1) {
-		return d3.text("assets/averaged_data/overall.txt", function(text) {
-			var data2 = d3.csv.parseRows(text).map(function(row) {
-		    return row.map(function(value) {
-		      return +value;
-		    });
-		  });
-			render_vis(data1, data2);
-			createTimeFilter(data2);
+	d3.csv("assets/line_names.csv", function(data_line) {
+		d3.csv("assets/line_stations.csv", function(data1) {
+			return d3.text("assets/averaged_data/overall.txt", function(text) {
+				var data2 = d3.csv.parseRows(text).map(function(row) {
+			    return row.map(function(value) {
+			      return +value;
+			    });
+			  });
+				render_vis(data_line, data1, data2);
+				createTimeFilter(data2);
 
-			d3.csv("assets/filters.csv", function(filters) {
-				filters.forEach(function(d) {
+				d3.csv("assets/filters.csv", function(filters) {
+					filters.forEach(function(d) {
 
-					var option = document.createElement("option");
-					option.text = d.label;
-					option.value = d.label;
-					option.disabled = true;
+						var option = document.createElement("option");
+						option.text = d.label;
+						option.value = d.label;
+						option.disabled = true;
 
-					var menu = document.getElementById("filter-menu");
-					menu.add(option);
-					d3.text("assets/averaged_data/" + d.file_name + ".txt", function(text) {
-						var data = d3.csv.parseRows(text).map(function(row) {
-					    return row.map(function(value) {
-					      return +value;
-					    });
-					  });
-					  root.add_dataset(d.label, data);
-					  root.add_slider_dataset(d.label, data);
-					  $("option[value=\""+ d.label +"\"]").prop("disabled", false);
+						var menu = document.getElementById("filter-menu");
+						menu.add(option);
+						d3.text("assets/averaged_data/" + d.file_name + ".txt", function(text) {
+							var data = d3.csv.parseRows(text).map(function(row) {
+						    return row.map(function(value) {
+						      return +value;
+						    });
+						  });
+						  root.add_dataset(d.label, data);
+						  root.add_slider_dataset(d.label, data);
+						  $("option[value=\""+ d.label +"\"]").prop("disabled", false);
+						});
 					});
-				});
-			})
+				})
+			});
 		});
 	});
-
 }
